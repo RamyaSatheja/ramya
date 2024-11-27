@@ -1,133 +1,134 @@
+
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DB_URI")
+  provider = "postgresql"
+  url      = env("DB_URI")
 }
 
 model User {
-    id               Int            @id @default(autoincrement())
-    name             String
-    email            String         @unique
-    password         String?
-    resetToken       String?
-    googleId         String?        @unique
-    discordId        String?        @unique
-    resetTokenExpiry DateTime?
-    role             String         @default("user")
-    gender           String?
-    age              Int?
-    phoneNumber      String?
-    createdAt        DateTime       @default(now())
-    updatedAt        DateTime       @updatedAt
-    tournaments      Tournament[]
-    captainedTeams   Team[]         @relation("TeamCaptain")
-    teamMembers      TeamMember[]
-    notifications    Notification[]
+  id                  Int     @id @default(autoincrement())
+  name                String
+  email               String   @unique
+  password            String?
+  resetToken          String?
+  googleId            String?   @unique
+  discordId           String?   @unique
+  resetTokenExpiry   DateTime?
+  role                String   @default("user")
+  gender              String?
+  age                 Int?
+  phoneNumber         String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  tournaments         Tournament[]
+  captainedTeams      Team[]   @relation("TeamCaptain")
+  teamMembers          TeamMember[]
+  notifications        Notification[]
 }
 
 model Subscribers {
-    id           Int            @id @default(autoincrement())
-    email       String
+  id    Int     @id @default(autoincrement())
+  email String
 }
 
 model GamePass {
-    id           Int          @id @default(autoincrement())
-    title        String
-    description  String
-    price        Float
-    gamePassType String
-    isFree       Boolean
-    status       String
-    fileUrl      String
-    tournaments  Tournament[]
-    createdAt    DateTime     @default(now())
-    updatedAt    DateTime     @updatedAt
+  id              Int     @id @default(autoincrement())
+  title           String
+  description     String
+  price           Float
+  gamePassType    String
+  isFree          Boolean
+  status          String
+  fileUrl         String
+  tournaments     Tournament[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Team {
-    id           Int          @id @default(autoincrement())
-    name         String
-    tournamentId Int
-    tournament   Tournament   @relation(fields: [tournamentId], references: [id])
-    captainId    Int
-    captain      User         @relation("TeamCaptain", fields: [captainId], references: [id])
-    members      TeamMember[]
-    createdAt    DateTime     @default(now())
-    updatedAt    DateTime     @updatedAt
-    heardFrom    String
+  id            Int     @id @default(autoincrement())
+  name          String
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId  Int
+  captain       User     @relation("TeamCaptain", fields: [captainId], references: [id])
+  captainId     Int
+  members        TeamMember[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  heardFrom      String
 }
 
 model TeamMember {
-    id        Int      @id @default(autoincrement())
-    teamId    Int
-    team      Team     @relation(fields: [teamId], references: [id])
-    userId    Int
-    user      User     @relation(fields: [userId], references: [id])
-    status    String   @default("pending") // "pending", "accepted", "rejected"
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int     @id @default(autoincrement())
+  team      Team    @relation(fields: [teamId], references: [id])
+  teamId    Int
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  status    String  @default("pending")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Tournament {
-    id                   Int            @id @default(autoincrement())
-    tournamentType       String
-    entryFee             Float
-    title                String
-    description          String
-    status               String
-    winner               String?
-    prize                Float
-    fileUrl              String
-    maxNofTeams          Int
-    maxNofPlayersPerTeam Int
-    startDate            DateTime
-    endDate              DateTime
-    gamePassId           Int?
-    gamePass             GamePass?      @relation(fields: [gamePassId], references: [id])
-    userId               Int?
-    user                 User?          @relation(fields: [userId], references: [id])
-    bracket              Json?
-    createdAt            DateTime       @default(now())
-    updatedAt            DateTime       @updatedAt
-    teams                Team[]
-    notifications        Notification[]
+  id                     Int       @id @default(autoincrement())
+  tournamentType        String
+  entryFee              Float
+  title                  String
+  description            String
+  status                 String
+  winner                 String?
+  prize                  Float
+  fileUrl                String
+  maxNofTeams           Int
+  maxNofPlayersPerTeam Int
+  startDate              DateTime
+  endDate                DateTime
+  gamePass               GamePass? @relation(fields: [gamePassId], references: [id])
+  gamePassId             Int?
+  organizer               User?    @relation(fields: [userId], references: [id])
+  userId                  Int?
+  bracket                 Json?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  teams                   Team[]
+  notifications           Notification[]
 }
 
 model SocialMediaPost {
-    id        Int      @id @default(autoincrement())
-    platform  String
-    url       String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int     @id @default(autoincrement())
+  platform  String
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Notification {
-    id           Int        @id @default(autoincrement())
-    tournament   Tournament @relation(fields: [tournamentId], references: [id])
-    tournamentId Int
-    message      String
-    type         String // e.g., "invite_sent", "invite_accepted", "invite_rejected"
-    read         Boolean    @default(false)
-    createdAt    DateTime   @default(now())
-    updatedAt    DateTime   @updatedAt
-    User         User       @relation(fields: [userId], references: [id])
-    userId       Int
+  id            Int     @id @default(autoincrement())
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId  Int
+  message       String
+  type          String
+  read          Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  recipient     User    @relation(fields: [userId], references: [id])
+  userId        Int
 }
 
 model PartnerPost {
-    id        Int      @id @default(autoincrement())
-    fileUrl   String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int     @id @default(autoincrement())
+  fileUrl   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model HeroPost {
-    id        Int      @id @default(autoincrement())
-    fileUrl   String
-    linkUrl   String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int     @id @default(autoincrement())
+  fileUrl   String
+  linkUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
